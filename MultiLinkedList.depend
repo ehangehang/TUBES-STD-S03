@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1640267965 source:e:\ehg\smt3\std\tubes\multilinkedlist\adtmll.cpp
+	"adtmll.h"
+
+1640268005 e:\ehg\smt3\std\tubes\multilinkedlist\adtmll.h
+	<iostream>
+	<stdlib.h>
+
+1640258535 source:e:\ehg\smt3\std\tubes\multilinkedlist\main.cpp
+	"adtmll.h"
+
