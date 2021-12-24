@@ -5,27 +5,9 @@ int main()
     listParent P;
     listGames G;
 
-    createListParent(P);
-    createListGame(G);
-
-    //int userChoice;
-    //login(userChoice);
-
-    /**
-        addParentFirst clear (v)
-    */
-    addParentFirst(P, "Horror");
-    addParentFirst(P, "RPG");
-    addParentFirst(P, "Simulation");
-    addParentFirst(P, "Action");
-    addParentFirst(P, "Sport");
-    adrParent helperP = P.firstParent;
-    while (helperP != NULL) {
-        cout << helperP->genre << " ";
-        helperP = helperP->nextParent;
-    }
-    cout << endl;
-
+    int userChoice;
+    login(userChoice, P, G);
+/*
     dataGame data;
     data.judul = "Just Cause";
     data.studio = "Square Enix";
@@ -90,6 +72,6 @@ int main()
         cout << endl;
     }
     cout << endl;
-
+*/
     return 0;
 }

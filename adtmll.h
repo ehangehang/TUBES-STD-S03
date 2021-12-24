@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <conio.h>
+#include <string>
 using namespace std;
 
 typedef struct elmParent *adrParent;
@@ -11,6 +13,7 @@ typedef struct elmGames *adrGames;
 struct dataGame {
     string judul;
     string studio;
+    string genre;
     string tahun;
     string description;
     int rating;
@@ -59,19 +62,34 @@ STEAM MLL
         6. menghitung keranjang
 */
 
+//INIT
 void createListParent(listParent &P);
 void createListGame(listGames &G);
 adrParent newGenre(string genre);
 adrGames newGame(dataGame game);
+
+//ADD
 void addParentFirst(listParent &P, string genre);
-void addGameLast(listGames &G, dataGame game);
+void addGameLast(listParent &P, listGames &G, dataGame game);
 adrParent searchGenre(listParent &P, string genre);
 adrGames searchGameJudul(listGames &G, string gameJudul);
-void addChildToParentFirst(listParent &P, listGames G, string genre, string gameJudul);
+void addChildToParentFirst(listParent &P, listGames G);
 
-void login(int userChoice);
+//DELETE
+void deleteGenre(listParent &P, string genre, adrParent &storeP);
+void deleteGame(listGames &G, string judulGame, adrGames &storeG);
+//deleteChild belum dibuat
+void deleteChild(listParent &P, listGames &G, string judulGame);
+
+//PRINTING
+void printParent(listParent P);
+void printListGame(listGames G);
+void printParentChild(listParent P);
+
+//MENU
+void login(int userChoice, listParent &P, listGames &G);
 void menuChoices(int userChoice);
-void menuAdmin(int user);
-void menuCustomer(int user);
+void menuAdmin(int user, listParent &P, listGames &G);
+void menuCustomer(int user, listParent &P, listGames &G);
 
 #endif // ADTMLL_H_INCLUDED
