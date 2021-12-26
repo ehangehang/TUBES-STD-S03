@@ -46,12 +46,12 @@ struct listGames {
 STEAM MLL
 -user class (admin, customer)
     -admin:
-        1. nambah genre
-        2. nambah game
-        3. menghapus genre
-        4. menghapus game
-        5. mencari genre
-        6. mencari game
+        1. nambah genre (v)
+        2. nambah game (v)
+        3. menghapus genre (v)
+        4. menghapus game (v)
+        5. mencari genre (v)
+        6. mencari game (v)
         7. menghitung jumlah game per genre (v)
     -customer:
         1. mencari genre
@@ -77,14 +77,15 @@ void addChildToParentFirst(listParent &P, listGames G);
 
 //DELETE
 void deleteGenre(listParent &P, string genre, adrParent &storeP);
-void deleteGame(listGames &G, string judulGame, adrGames &storeG);
-//deleteChild belum dibuat
-void deleteChild(listParent &P, listGames &G, string judulGame);
+void deleteGame(listParent &P, listGames &G, string judulGame, adrGames &storeG);
+void deleteChild(listParent &P, adrGames storeG, adrChild &storeC);
 
 //PRINTING
 void printParent(listParent P);
 void printListGame(listGames G);
 void printParentChild(listParent P);
+//customer side
+void printGenreDetail(listParent P); //belum
 
 //MENU
 void login(int userChoice, listParent &P, listGames &G);

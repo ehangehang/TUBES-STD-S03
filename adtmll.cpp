@@ -105,7 +105,7 @@ void addChildToParentFirst(listParent &P, listGames G) {
         P.firstParent->firstChild = C;
     } else {
         adrParent tobeP = P.firstParent;
-        while (tobeP != NULL && foundGenre) {
+        while (tobeP != NULL && foundGenre == false) {
             if (tobeP->genre == C->infoChild->info.genre) {
                 C->nextChild = tobeP->firstChild;
                 tobeP->firstChild = C;
@@ -163,8 +163,10 @@ void deleteGenre(listParent &P, string genre, adrParent &storeP) {
     }
 }
 
-void deleteGame(listGames &G, string judulGame, adrGames &storeG) {
+void deleteGame(listParent &P, listGames &G, string judulGame, adrGames &storeG) {
     bool found = false;
+    adrParent adrP, helperP;
+    adrChild storeC;
 
     if (G.firstGames == NULL) {
         cout << "List kosong!" << endl;
@@ -172,9 +174,12 @@ void deleteGame(listGames &G, string judulGame, adrGames &storeG) {
     } else {
         if (G.firstGames->info.judul == judulGame) {
             storeG = G.firstGames;
-            G.firstGames = G.firstGames->nextGame;
+            if (G.firstGames->nextGame != NULL) {
+                G.firstGames = G.firstGames->nextGame;
+            } else {
+                G.firstGames = NULL;
+            }
             storeG->nextGame = NULL;
-            G.firstGames->prevGame = NULL;
             found = true;
         } else if (G.lastGames->info.judul == judulGame) {
             storeG = G.lastGames;
@@ -199,6 +204,48 @@ void deleteGame(listGames &G, string judulGame, adrGames &storeG) {
 
         if (found == false) {
             cout << "Game tidak ditemukan!" << endl;
+        }else {
+            deleteChild(P, storeG, storeC);
+        }
+    }
+}
+
+void deleteChild(listParent &P, adrGames storeG, adrChild &storeC) {
+    adrParent helperGenre = P.firstParent;
+
+    while (helperGenre != NULL) {
+        if (helperGenre->genre == storeG->info.genre) {
+            break;
+        }
+        helperGenre = helperGenre->nextParent;
+    }
+
+    if (helperGenre->firstChild->infoChild->info.judul == storeG->info.judul) {
+        storeC = helperGenre->firstChild;
+        if (helperGenre->firstChild->nextChild != NULL) {
+            helperGenre->firstChild = helperGenre->firstChild->nextChild;
+        } else {
+            helperGenre->firstChild = NULL;
+        }
+        storeC->nextChild = NULL;
+    } else {
+        adrChild helperC = helperGenre->firstChild;
+        adrChild helperCA = helperGenre->firstChild;
+        bool found = false;
+        while (helperCA != NULL && found == false) {
+            if (helperCA->infoChild->info.judul == storeG->info.judul) {
+                storeC = helperCA;
+                helperC->nextChild = storeC->nextChild;
+                storeC->nextChild = NULL;
+                found = true;
+            }
+            helperC = helperCA;
+            helperCA = helperCA->nextChild;
+        }
+
+        if (found == false) {
+            storeC = helperCA;
+            helperC->nextChild = NULL;
         }
     }
 }
@@ -252,6 +299,7 @@ void printParentChild(listParent P) {
                 helperC = helperC->nextChild;
                 i++;
             }
+            i = 1;
             helperPC = helperPC->nextParent;
         }
     }
@@ -292,11 +340,13 @@ void menuChoices(int userChoice) {
         cout << "7. Tampilkan jumlah game tiap genre" << endl;
         cout << "0. Exit" << endl;
     } else if (userChoice == 2) {
-        cout << "====== MENU ADMIN ======" << endl;
+        cout << "====== MENU CUSTOMER ======" << endl;
         cout << "1. Tampilkan semua game dengan genre tertentu" << endl;
-        cout << "2. Tampilkan game berdasarkan judul" << endl;
-        cout << "3. Masukkan game ke keranjang" << endl;
-        cout << "4. Menghitung harga keranjang" << endl;
+        cout << "2. Tampilkan detail game berdasarkan judul" << endl;
+        cout << "3. Filter genre tertentu menurut harga" << endl;
+        cout << "4. "
+        cout << ". Masukkan game ke keranjang" << endl;
+        cout << ". Menghitung harga keranjang" << endl;
     }
 }
 
@@ -369,7 +419,7 @@ void menuAdmin(int user, listParent &P, listGames &G) {
             break;
         case 3:
             system("cls");
-            cout << "Genre yang ingin dihapus: "; cin >> tobeDelGenre;
+            cout << "Genre yang ingin dihapus: "; getline(cin >> std::ws, tobeDelGenre);
             deleteGenre(P, tobeDelGenre, storeP);
             cout << endl << "Selesai! Tekan enter untuk kembali ke menu utama" << endl;
             getch();
@@ -380,8 +430,8 @@ void menuAdmin(int user, listParent &P, listGames &G) {
             break;
         case 4:
             system("cls");
-            cout << "Judul game yang ingin dihapus: "; cin >> tobeDelGame;
-            deleteGame(G, tobeDelGame, storeG);
+            cout << "Judul game yang ingin dihapus: "; getline(cin >> std::ws, tobeDelGame);
+            deleteGame(P, G, tobeDelGame, storeG);
             cout << endl << "Selesai! Tekan enter untuk kembali ke menu utama" << endl;
             getch();
 
@@ -426,6 +476,17 @@ void menuAdmin(int user, listParent &P, listGames &G) {
         cout << "Selesai!" << endl;
     }
 }
+
+/*
+cout << "====== MENU CUSTOMER ======" << endl;
+cout << "1. Tampilkan semua game dengan genre tertentu" << endl;
+cout << "2. Tampilkan detail game berdasarkan judul" << endl;
+cout << "3. Filter genre tertentu menurut harga" << endl;
+cout << "4. "
+cout << ". Masukkan game ke keranjang" << endl;
+cout << ". Menghitung harga keranjang" << endl;
+*/
+
 void menuCustomer(int user, listParent &P, listGames &G) {
     system("cls");
 
