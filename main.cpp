@@ -5,6 +5,10 @@ int main()
     listParent P;
     listGames G;
 
+    //init list
+    createListParent(P);
+    createListGame(G);
+
     int userChoice;
     login(userChoice, P, G);
 /*

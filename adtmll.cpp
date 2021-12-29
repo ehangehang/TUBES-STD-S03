@@ -88,7 +88,12 @@ adrParent searchGenre(listParent &P, string genre) {
 }
 
 /**
-    ADD TO MULTIPLE PARENT (...)
+    ADD TO MULTIPLE PARENT (~)
+    still error if input descending
+    eg.
+    1. nGenre = 3
+    2. nGenre = 4
+    then all genre will be reset with random value
 */
 void addChildToParentFirst(listParent &P, listGames G) {
     adrChild C = new elmChild;
@@ -99,6 +104,31 @@ void addChildToParentFirst(listParent &P, listGames G) {
     C->infoChild = tobeG;
     C->nextChild = NULL;
 
+    if (P.firstParent == NULL) {
+        for (int i = 0; i < C->infoChild->info.nGenre; i++) {
+            addParentFirst(P, C->infoChild->info.genre[i]);
+            P.firstParent->firstChild = C;
+        }
+    } else {
+        for (int i = 0; i < C->infoChild->info.nGenre; i++) {
+            foundGenre = false;
+            adrParent tobeP = P.firstParent;
+            while (tobeP != NULL && foundGenre == false) {
+                if (tobeP->genre == C->infoChild->info.genre[i]) {
+                    C->nextChild = tobeP->firstChild;
+                    tobeP->firstChild = C;
+                    foundGenre = true;
+                }
+                tobeP = tobeP->nextParent;
+            }
+            if (foundGenre == false) {
+                addParentFirst(P, C->infoChild->info.genre[i]);
+                P.firstParent->firstChild = C;
+            }
+        }
+    }
+
+/*
     if (P.firstParent == NULL) {
         addParentFirst(P, C->infoChild->info.genre);
         C->nextChild = P.firstParent->firstChild;
@@ -119,6 +149,7 @@ void addChildToParentFirst(listParent &P, listGames G) {
             P.firstParent->firstChild = C;
         }
     }
+*/
 }
 
 void deleteGenre(listParent &P, string genre, adrParent &storeP) {
@@ -212,7 +243,42 @@ void deleteGame(listParent &P, listGames &G, string judulGame, adrGames &storeG)
 
 void deleteChild(listParent &P, adrGames storeG, adrChild &storeC) {
     adrParent helperGenre = P.firstParent;
+    bool found = false;
 
+    for (int i = 0; i < storeG->info.nGenre; i++) {
+        found = false;
+        while (helperGenre != NULL && found == false) {
+            if (helperGenre->genre == storeG->info.genre[i]) {
+                found = true;
+            } else {
+                helperGenre = helperGenre->nextParent;
+            }
+        }
+
+        if (helperGenre->firstChild->infoChild->info.judul == storeG->info.judul) {
+            storeC = helperGenre->firstChild;
+            if (helperGenre->firstChild->nextChild != NULL) {
+                helperGenre->firstChild = helperGenre->firstChild->nextChild;
+            } else {
+                helperGenre->firstChild = NULL;
+            }
+            storeC->nextChild = NULL;
+        } else {
+            adrChild helperC = helperGenre->firstChild;
+            adrChild helperCA = helperGenre->firstChild;
+            while (helperCA != NULL) {
+                if (helperCA->infoChild->info.judul == storeG->info.judul) {
+                    storeC = helperCA;
+                    helperC->nextChild = storeC->nextChild;
+                    storeC->nextChild = NULL;
+                }
+                helperC = helperCA;
+                helperCA = helperCA->nextChild;
+            }
+        }
+    }
+
+    /*
     while (helperGenre != NULL) {
         if (helperGenre->genre == storeG->info.genre) {
             break;
@@ -248,6 +314,7 @@ void deleteChild(listParent &P, adrGames storeG, adrChild &storeC) {
             helperC->nextChild = NULL;
         }
     }
+    */
 }
 
 void printParent(listParent P) {
@@ -275,7 +342,10 @@ void printListGame(listGames G) {
             cout << "Judul      : " << helperG->info.judul << endl;
             cout << "Studio     : " << helperG->info.studio << endl;
             cout << "Tahun      : " << helperG->info.tahun << endl;
-            cout << "Genre      : " << helperG->info.genre << endl;
+            cout << "Genre      : " << endl;
+            for (int i = 0; i < helperG->info.nGenre; i++) {
+                cout << i+1 << ". " << helperG->info.genre[i] << endl;
+            }
             cout << "Description: " << helperG->info.description << endl;
             cout << "Rating     : " << helperG->info.rating << "/5" << endl;
             cout << "Harga      : " << helperG->info.harga << endl << endl;
@@ -305,10 +375,71 @@ void printParentChild(listParent P) {
     }
 }
 
+void printGenreDetail(listParent P, string genre) {
+    if (P.firstParent == NULL) {
+        cout << "List kosong!" << endl;
+    } else {
+        adrParent helper = P.firstParent;
+        while (helper != NULL) {
+            if (helper->genre == genre) {
+                break;
+            }
+            helper = helper->nextParent;
+        }
+        if (helper->firstChild == NULL) {
+            cout << "List genre kosong!" << endl;
+        } else {
+            adrChild helperC = helper->firstChild;
+            int i = 1;
+            while (helperC != NULL) {
+                cout << "Game " << i << ":" << endl;
+                cout << "Judul      : " << helperC->infoChild->info.judul << endl;
+                cout << "Studio     : " << helperC->infoChild->info.studio << endl;
+                cout << "Genre      : " << endl;
+                for (int i = 0; i < helperC->infoChild->info.nGenre; i++) {
+                    cout << i+1 << ". " << helperC->infoChild->info.genre[i] << endl;
+                }
+                cout << "Tahun Rilis: " << helperC->infoChild->info.tahun << endl;
+                cout << "Deskripsi  : " << helperC->infoChild->info.description << endl;
+                cout << "Rating     : " << helperC->infoChild->info.rating << endl;
+                cout << "Harga      : " << helperC->infoChild->info.harga << endl << endl;
+                helperC = helperC->nextChild;
+                i++;
+            }
+        }
+    }
+}
+
+void printSpcGameDetail(listParent P, listGames G, string judulGame) {
+    if (P.firstParent == NULL) {
+        cout << "List kosong!" << endl;
+    } else {
+        adrGames helperG = searchGameJudul(G, judulGame);
+        adrParent helperP = P.firstParent;
+        int i = 0;
+        while (i < helperG->info.nGenre) {
+            while (helperP != NULL) {
+                if (helperP->genre == helperG->info.genre[i]) {
+                    cout << helperG->info.judul << " ditemukan di genre " << helperP->genre[i] << endl;
+                }
+                helperP = helperP->nextParent;
+            }
+            i++;
+        }
+        cout << "Judul      : " << helperG->info.judul << endl;
+        cout << "Studio     : " << helperG->info.studio << endl;
+        cout << "Genre      : " << endl;
+        for (int j = 0; j < helperG->info.nGenre; j++) {
+            cout << i+1 << ". " << helperG->info.genre[j] << endl;
+        }
+        cout << "Tahun Rilis: " << helperG->info.tahun << endl;
+        cout << "Deskripsi  : " << helperG->info.description << endl;
+        cout << "Rating     : " << helperG->info.rating << endl;
+        cout << "Harga      : " << helperG->info.harga << endl << endl;
+    }
+}
+
 void login(int userChoice, listParent &P, listGames &G) {
-    //init list
-    createListParent(P);
-    createListGame(G);
 
     cout << "Login sebagai?" << endl;
     cout << "1. Admin" << endl;
@@ -338,15 +469,18 @@ void menuChoices(int userChoice) {
         cout << "5. Tampilkan daftar genre" << endl;
         cout << "6. Tampilkan daftar game" << endl;
         cout << "7. Tampilkan jumlah game tiap genre" << endl;
+        cout << "99. Kembali ke menu login" << endl;
         cout << "0. Exit" << endl;
     } else if (userChoice == 2) {
         cout << "====== MENU CUSTOMER ======" << endl;
         cout << "1. Tampilkan semua game dengan genre tertentu" << endl;
         cout << "2. Tampilkan detail game berdasarkan judul" << endl;
         cout << "3. Filter genre tertentu menurut harga" << endl;
-        cout << "4. "
+        cout << "4. " << endl;
         cout << ". Masukkan game ke keranjang" << endl;
         cout << ". Menghitung harga keranjang" << endl;
+        cout << "99. Kembali ke menu login" << endl;
+        cout << "0. Exit" << endl;
     }
 }
 
@@ -361,6 +495,7 @@ void menuAdmin(int user, listParent &P, listGames &G) {
     //case 2 variables
     dataGame gameData;
     char yono = 'N';
+    string inputGenre;
     //case 3 variables
     string tobeDelGenre;
     adrParent storeP;
@@ -392,7 +527,15 @@ void menuAdmin(int user, listParent &P, listGames &G) {
                 cout << "Masukkan data game baru:" << endl;
                 cout << "Judul game : "; getline(cin >> std::ws, gameData.judul);
                 cout << "Studio     : "; getline(cin >> std::ws, gameData.studio);
-                cout << "Genre      : "; cin >> gameData.genre;
+                cout << "Genre      : " << endl;
+                gameData.nGenre = 0;
+                for (int i = 0; i < sizeof(gameData.genre) && inputGenre != "-"; i++) {
+                    cout << i+1 << ". "; cin >> inputGenre;
+                    if (inputGenre != "-") {
+                        gameData.genre[i] = inputGenre;
+                        gameData.nGenre++;
+                    }
+                }
                 cout << "Tahun rilis: "; cin >> gameData.tahun;
                 cout << "Description: "; getline(cin >> std::ws, gameData.description);
                 cout << "Rating     : "; cin >> gameData.rating;
@@ -400,7 +543,10 @@ void menuAdmin(int user, listParent &P, listGames &G) {
                 system("cls");
                 cout << "Judul game : " << gameData.judul << endl;
                 cout << "Studio     : " << gameData.studio << endl;
-                cout << "Genre      : " << gameData.genre << endl;
+                cout << "Genre      : " << endl;
+                for (int i = 0; i < gameData.nGenre; i++) {
+                    cout << i+1 << ". " << gameData.genre[i] << endl;
+                }
                 cout << "Tahun rilis: " << gameData.tahun << endl;
                 cout << "Description: " << gameData.description << endl;
                 cout << "Rating     : " << gameData.rating << endl;
@@ -411,6 +557,7 @@ void menuAdmin(int user, listParent &P, listGames &G) {
             if (yono == 'Y') {
                 addGameLast(P, G, gameData);
                 yono = 'N';
+                inputGenre = "XX";
             }
 
             system("cls");
@@ -469,6 +616,10 @@ void menuAdmin(int user, listParent &P, listGames &G) {
             menuChoices(user);
             cout << "Pilih menu: "; cin >> choice;
             break;
+        case 99:
+            system("cls");
+            login(user, P, G);
+            break;
         }
     }
     if (choice == 0) {
@@ -492,18 +643,30 @@ void menuCustomer(int user, listParent &P, listGames &G) {
 
     menuChoices(user);
     int choice;
+    //case 1 variables
+    string genreGame;
+    //case 2 variables
+    string findGame;
     cout << "Pilih menu: "; cin >> choice;
     while (choice != 0) {
         switch (choice) {
         case 1:
-            cout << "do action " << choice << endl;
+            system("cls");
+            cout << "Masukkan genre yang ingin dilihat: "; cin >> genreGame;
+            printGenreDetail(P, genreGame);
+            cout << "Selesai! Tekan enter untuk kembali ke menu utama" << endl;
+            getch();
 
             system("cls");
             menuChoices(user);
             cout << "Pilih menu: "; cin >> choice;
             break;
         case 2:
-            cout << "do action " << choice << endl;
+            system("cls");
+            cout << "Masukkan game yang ingin dicari: "; getline(cin >> std::ws, findGame);
+            printSpcGameDetail(P, G, findGame);
+            cout << "Selesai! Tekan enter untuk kembali ke menu utama" << endl;
+            getch();
 
             system("cls");
             menuChoices(user);
@@ -522,6 +685,10 @@ void menuCustomer(int user, listParent &P, listGames &G) {
             system("cls");
             menuChoices(user);
             cout << "Pilih menu: "; cin >> choice;
+            break;
+        case 99:
+            system("cls");
+            login(user, P, G);
             break;
         }
     }

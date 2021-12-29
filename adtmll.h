@@ -13,7 +13,8 @@ typedef struct elmGames *adrGames;
 struct dataGame {
     string judul;
     string studio;
-    string genre;
+    string genre[10];
+    int nGenre;
     string tahun;
     string description;
     int rating;
@@ -85,7 +86,8 @@ void printParent(listParent P);
 void printListGame(listGames G);
 void printParentChild(listParent P);
 //customer side
-void printGenreDetail(listParent P); //belum
+void printGenreDetail(listParent P, string genre);
+void printSpcGameDetail(listParent P, listGames G, string judulGame);
 
 //MENU
 void login(int userChoice, listParent &P, listGames &G);
